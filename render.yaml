@@ -1,0 +1,25 @@
+# مسموع — إعداد النشر على Render
+databases:
+  - name: masmoo-db
+    databaseName: masmoo
+    plan: free
+    postgresMajorVersion: "16"
+
+services:
+  - type: web
+    name: masmoo
+    runtime: python
+    plan: free
+    region: frankfurt
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: masmoo-db
+          property: connectionString
+      - key: MASMOO_OFFICERS
+        sync: false
+      - key: PYTHON_VERSION
+        value: "3.12.4"
