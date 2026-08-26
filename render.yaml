@@ -1,8 +1,8 @@
-# مسموع — إعداد النشر على Render
 databases:
   - name: masmoo-db
     databaseName: masmoo
     plan: free
+    region: frankfurt
     postgresMajorVersion: "16"
 
 services:
