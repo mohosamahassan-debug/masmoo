@@ -326,7 +326,9 @@ def export_csv(u=Depends(director)):
 #   /p/  → تطبيق المرضى        /a/  → تطبيق الإدارة
 from fastapi.responses import FileResponse, RedirectResponse, HTMLResponse
 
-WEB = os.path.join(HERE, "web")
+# ملفات الواجهة: داخل مجلد web/ إن وُجد، وإلا فبجوار هذا الملف مباشرة
+_w = os.path.join(HERE, "web")
+WEB = _w if os.path.isdir(_w) else HERE
 
 def _send(name: str, media: str = None):
     path = os.path.join(WEB, name)

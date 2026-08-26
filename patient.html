@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#062429">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="مسموع">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="خدمة استقبال ومتابعة بلاغات المرضى بمستشفى الدمازين التعليمي">
+<title>مسموع — مستشفى الدمازين التعليمي</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+:root{
+  --n900:#052026; --n800:#0A343A; --n700:#0F4A50;
+  --teal:#0F8378; --teal-d:#0B6A61; --teal-s:#E2F0EE;
+  --sand:#DFA92B; --sand-s:#FAF0D9;
+  --clay:#BC4430; --clay-s:#F8E3DE;
+  --violet:#5B4A9B; --violet-s:#ECE8F7;
+  --steel:#2E5F8A; --steel-s:#E5EDF6;
+  --paper:#EFF3F2; --card:#FFF; --ink:#0F2225; --mut:#66807F; --line:#DBE4E3;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{background:var(--n900);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;color:var(--ink);display:flex;align-items:center;justify-content:center;font-size:14px}
+#app{width:100%;max-width:430px;height:100dvh;max-height:920px;background:var(--paper);position:relative;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 30px 90px rgba(0,0,0,.55)}
+@media(min-width:520px){#app{border-radius:30px;height:90dvh}}
+svg{stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- SPLASH ---------- */
+#splash{position:absolute;inset:0;z-index:200;background:linear-gradient(165deg,var(--n800),var(--n900));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;transition:opacity .5s,visibility .5s}
+#splash.out{opacity:0;visibility:hidden}
+.crest{width:76px;height:76px;border-radius:22px;border:1.5px solid rgba(223,169,43,.45);display:grid;place-items:center;color:var(--sand);animation:crestIn .8s cubic-bezier(.2,.8,.3,1)}
+@keyframes crestIn{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
+#splash h1{font-family:'Noto Kufi Arabic';font-weight:800;font-size:34px;color:#fff;margin:0;letter-spacing:-1px}
+#splash p{margin:0;font-size:12px;color:#87A7A5;font-weight:300;text-align:center;line-height:1.9}
+#splash .ln{width:38px;height:2px;background:var(--sand);border-radius:2px;opacity:.6}
+
+/* ---------- HEADER ---------- */
+header{background:linear-gradient(165deg,var(--n800),var(--n900));color:#fff;padding:14px 18px 12px;position:relative;flex:0 0 auto}
+header::after{content:"";position:absolute;inset:auto 0 -1px;height:30px;background:radial-gradient(130% 100% at 50% 0%,transparent 60%,var(--paper) 61%)}
+.hd{display:flex;align-items:center;gap:11px;position:relative;z-index:2}
+.mark{width:38px;height:38px;border-radius:12px;border:1px solid rgba(223,169,43,.4);display:grid;place-items:center;color:var(--sand);flex:0 0 auto}
+.bn{font-family:'Noto Kufi Arabic';font-weight:800;font-size:20px;line-height:1;letter-spacing:-.5px}
+.bs{font-size:10px;color:#8CACAA;margin-top:4px;font-weight:300}
+.ibtn{width:36px;height:36px;border-radius:11px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#D2E4E2;display:grid;place-items:center;cursor:pointer;flex:0 0 auto;transition:.15s;position:relative}
+.ibtn:hover{background:rgba(255,255,255,.13)}
+.ibtn.on{background:var(--sand);color:var(--n900);border-color:var(--sand)}
+.ibtn svg{width:17px;height:17px}
+.ttl{position:relative;z-index:2;margin-top:13px}
+.ttl h1{font-family:'Noto Kufi Arabic';font-weight:600;font-size:15.5px;margin:0}
+.ttl p{margin:4px 0 0;font-size:11px;color:#88A9A7;font-weight:300}
+.role-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(223,169,43,.16);border:1px solid rgba(223,169,43,.35);color:var(--sand);font-size:10px;padding:3px 8px;border-radius:7px;margin-top:8px;font-weight:500}
+
+/* ---------- LAYOUT ---------- */
+main{flex:1;overflow-y:auto;padding:4px 16px 28px}
+main::-webkit-scrollbar{width:0}
+.scr{display:none;animation:fade .3s ease}
+.scr.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.lbl{font-size:10px;font-weight:600;color:var(--mut);letter-spacing:.5px;margin:20px 2px 9px;display:flex;align-items:center;gap:9px}
+.lbl::after{content:"";flex:1;height:1px;background:var(--line)}
+.card{background:var(--card);border-radius:15px;padding:15px;border:1px solid var(--line);margin-bottom:11px}
+
+/* ---------- NAV ---------- */
+nav{flex:0 0 auto;display:flex;background:#fff;border-top:1px solid var(--line);padding:6px 5px calc(6px + env(safe-area-inset-bottom))}
+nav button{flex:1;background:none;border:0;padding:6px 2px;cursor:pointer;color:var(--mut);font-family:inherit;font-size:9.5px;font-weight:500;display:flex;flex-direction:column;align-items:center;gap:4px;border-radius:11px;position:relative}
+nav button svg{width:20px;height:20px}
+nav button.on{color:var(--n800)}
+nav button.on svg{color:var(--teal);stroke-width:2.1}
+nav .cnt{position:absolute;top:2px;left:calc(50% - 20px);background:var(--clay);color:#fff;font-family:'IBM Plex Mono';font-size:9px;min-width:16px;height:16px;border-radius:9px;display:grid;place-items:center;padding:0 4px}
+
+/* ---------- FORM ---------- */
+label.fl{display:block;font-size:12.5px;font-weight:600;margin-bottom:7px;color:var(--n800)}
+label.fl span{color:var(--mut);font-weight:400;font-size:11px}
+input,textarea,select{width:100%;padding:12px 13px;border:1.5px solid var(--line);border-radius:11px;font-family:inherit;font-size:14px;background:#FBFCFC;color:var(--ink);outline:none;transition:.15s}
+input:focus,textarea:focus,select:focus{border-color:var(--teal);background:#fff;box-shadow:0 0 0 3px var(--teal-s)}
+textarea{resize:vertical;min-height:98px;line-height:1.7}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opt{display:flex;align-items:center;gap:10px;padding:11px 12px;border:1.5px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;transition:.14s;text-align:right;font-family:inherit;width:100%}
+.opt:hover{border-color:#BDCDCB}
+.opt svg{width:19px;height:19px;color:var(--teal);flex:0 0 auto}
+.opt span{font-size:12.5px;font-weight:500;color:var(--n800);line-height:1.3}
+.opt.on{background:var(--n800);border-color:var(--n800)}
+.opt.on span{color:#fff}
+.opt.on svg{color:var(--sand)}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{padding:9px 13px;border:1.5px solid var(--line);border-radius:10px;background:#fff;font-family:inherit;font-size:12.5px;font-weight:500;color:var(--n800);cursor:pointer;transition:.14s}
+.chip.on{background:var(--n800);color:#fff;border-color:var(--n800)}
+.chip.p-on[data-v="عادي"]{background:var(--teal);border-color:var(--teal);color:#fff}
+.chip.p-on[data-v="عاجل"]{background:var(--sand);border-color:var(--sand);color:var(--n900)}
+.chip.p-on[data-v="حرج"]{background:var(--clay);border-color:var(--clay);color:#fff}
+.btn{width:100%;padding:15px;border:0;border-radius:13px;background:var(--teal);color:#fff;font-family:'Noto Kufi Arabic';font-weight:600;font-size:14.5px;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;gap:9px}
+.btn svg{width:18px;height:18px}
+.btn:hover{background:var(--teal-d)}
+.btn:active{transform:scale(.985)}
+.btn.ghost{background:#fff;color:var(--n800);border:1.5px solid var(--line)}
+.btn.dark{background:var(--n800)}
+.btn.sm{padding:11.5px;font-size:13px;border-radius:11px}
+.btn.danger{color:var(--clay)}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0}
+.tgl{width:45px;height:26px;border-radius:20px;background:#CCD9D8;position:relative;cursor:pointer;border:0;flex:0 0 auto;transition:.2s}
+.tgl::after{content:"";position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.22)}
+.tgl.on{background:var(--teal)}
+.tgl.on::after{transform:translateX(-19px)}
+.hint{font-size:11px;color:var(--mut);line-height:1.65;margin:8px 0 0}
+.mono{font-family:'IBM Plex Mono';direction:ltr;unicode-bidi:embed}
+.drop{border:1.5px dashed var(--line);border-radius:12px;padding:15px;text-align:center;cursor:pointer;color:var(--mut);font-size:12.5px;background:#FBFCFC;display:flex;align-items:center;justify-content:center;gap:8px}
+.drop svg{width:17px;height:17px}
+.prev{position:relative;border-radius:11px;overflow:hidden;border:1px solid var(--line)}
+.prev img{width:100%;display:block;max-height:170px;object-fit:cover}
+.prev button{position:absolute;top:8px;left:8px;background:rgba(5,32,38,.82);color:#fff;border:0;border-radius:8px;padding:6px 11px;font-family:inherit;font-size:11px;cursor:pointer}
+
+/* ---------- TICKET ---------- */
+.tk{background:#fff;border-radius:17px;overflow:hidden;border:1px solid var(--line);margin-bottom:11px}
+.tk-t{background:linear-gradient(150deg,var(--n800),var(--n900));padding:19px 18px 22px;color:#fff;text-align:center}
+.tk-t .l{font-size:10px;color:#87A7A5;letter-spacing:1.2px;margin-bottom:9px}
+.tk-t .c{font-family:'IBM Plex Mono';font-weight:600;font-size:25px;letter-spacing:1.5px;color:var(--sand);direction:ltr}
+.notch{position:relative;height:20px;background:#fff}
+.notch::before,.notch::after{content:"";position:absolute;top:-10px;width:20px;height:20px;border-radius:50%;background:var(--paper);border:1px solid var(--line)}
+.notch::before{right:-11px}.notch::after{left:-11px}
+.notch i{position:absolute;top:9px;right:15px;left:15px;border-top:1.5px dashed var(--line);display:block}
+.tk-b{padding:3px 18px 17px}
+.kv{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px dashed #EBF0EF;font-size:13px}
+.kv:last-child{border:0}
+.kv .k{color:var(--mut);font-size:12px}
+.kv .v{font-weight:600;text-align:left;color:var(--n800)}
+
+/* ---------- STATUS ---------- */
+.st{display:inline-flex;align-items:center;gap:5px;padding:4.5px 10px;border-radius:7px;font-size:10.5px;font-weight:600;white-space:nowrap}
+.st::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.s0{background:var(--sand-s);color:#856009}
+.s1{background:var(--steel-s);color:var(--steel)}
+.s2{background:var(--violet-s);color:var(--violet)}
+.s3{background:var(--teal-s);color:var(--teal-d)}
+.s4{background:#EBF0EF;color:#587170}
+.late{background:var(--clay-s);color:var(--clay);font-size:10px;font-weight:600;padding:3.5px 8px;border-radius:6px}
+.sla{font-family:'IBM Plex Mono';font-size:10.5px;padding:3.5px 8px;border-radius:6px;background:var(--teal-s);color:var(--teal-d);direction:ltr}
+.sla.warn{background:var(--sand-s);color:#856009}
+.sla.over{background:var(--clay-s);color:var(--clay)}
+
+/* ---------- LIST ---------- */
+.it{background:#fff;border:1px solid var(--line);border-radius:13px;padding:13px 14px;margin-bottom:8px;cursor:pointer;transition:.15s;position:relative;overflow:hidden}
+.it:hover{border-color:#BDCDCB;transform:translateY(-1px)}
+.it::before{content:"";position:absolute;top:0;bottom:0;right:0;width:3.5px;background:var(--teal)}
+.it[data-p="عاجل"]::before{background:var(--sand)}
+.it[data-p="حرج"]::before{background:var(--clay)}
+.ih{display:flex;align-items:center;justify-content:space-between;gap:9px;margin-bottom:7px}
+.ic{font-family:'IBM Plex Mono';font-size:11.5px;font-weight:600;color:var(--n800);direction:ltr}
+.ix{font-size:13px;line-height:1.6;color:#3A4E51;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.im{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:9px;font-size:10.5px;color:var(--mut)}
+.tag{background:#F1F5F4;padding:3.5px 8px;border-radius:6px;font-size:10.5px;color:#4A6362;font-weight:500;display:inline-flex;align-items:center;gap:5px}
+.tag svg{width:12px;height:12px;color:var(--teal)}
+
+/* ---------- TIMELINE ---------- */
+.tl{position:relative;padding-right:21px}
+.tl::before{content:"";position:absolute;right:5.5px;top:8px;bottom:14px;width:1.5px;background:var(--line)}
+.ti{position:relative;padding-bottom:15px}
+.ti::before{content:"";position:absolute;right:-20.5px;top:5px;width:12px;height:12px;border-radius:50%;background:#fff;border:2.5px solid var(--line)}
+.ti.d::before{border-color:var(--teal);background:var(--teal)}
+.ti.c::before{border-color:var(--sand);background:var(--sand);box-shadow:0 0 0 4px var(--sand-s)}
+.ti b{font-size:12.5px;font-weight:600;color:var(--n800);display:block}
+.ti .dt{font-size:10.5px;color:var(--mut);margin-top:3px;font-family:'IBM Plex Mono';direction:ltr;text-align:right}
+.ti .nt{font-size:12px;color:#4A6362;margin-top:5px;line-height:1.65;background:#F7F9F9;padding:8px 10px;border-radius:8px}
+.ti .by{font-size:10px;color:var(--mut);margin-top:4px}
+
+/* ---------- STATS ---------- */
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:13px;padding:13px}
+.stat .n{font-family:'IBM Plex Mono';font-size:25px;font-weight:600;color:var(--n800);line-height:1}
+.stat .l2{font-size:10.5px;color:var(--mut);margin-top:6px}
+.stat.acc{background:linear-gradient(150deg,var(--n800),var(--n900));border-color:var(--n800)}
+.stat.acc .n{color:var(--sand)}.stat.acc .l2{color:#8CACAA}
+.stat.warn .n{color:var(--clay)}
+.br{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.br .l3{font-size:11.5px;width:96px;flex:0 0 auto;color:#3A4E51;display:flex;align-items:center;gap:6px}
+.br .l3 svg{width:13px;height:13px;color:var(--teal)}
+.tr{flex:1;height:8px;background:#EBF0EF;border-radius:4px;overflow:hidden}
+.fl2{height:100%;background:var(--teal);border-radius:4px;transition:width .6s cubic-bezier(.2,.8,.3,1)}
+.vl{font-family:'IBM Plex Mono';font-size:11.5px;color:var(--mut);width:24px;text-align:left}
+.spk{display:flex;align-items:flex-end;gap:5px;height:68px;margin-top:16px}
+.spk div{flex:1;border-radius:4px 4px 0 0;position:relative;min-height:4px;transition:height .6s}
+.spk div b{position:absolute;top:-16px;right:0;left:0;text-align:center;font-family:'IBM Plex Mono';font-size:9.5px;color:var(--mut)}
+.spx{display:flex;gap:5px;margin-top:6px}
+.spx span{flex:1;text-align:center;font-size:9px;color:var(--mut)}
+
+/* ---------- OVERLAY ---------- */
+.ov{position:absolute;inset:0;background:rgba(5,32,38,.55);backdrop-filter:blur(3px);z-index:60;display:none}
+.ov.on{display:block;animation:fade .2s}
+.sh{position:absolute;inset:auto 0 0 0;background:var(--paper);border-radius:22px 22px 0 0;max-height:93%;display:flex;flex-direction:column;animation:up .32s cubic-bezier(.2,.85,.3,1)}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+.shh{padding:13px 18px 11px;border-bottom:1px solid var(--line);background:#fff;border-radius:22px 22px 0 0}
+.grab{width:36px;height:4px;border-radius:3px;background:#D3DDDC;margin:0 auto 11px}
+.shb{overflow-y:auto;padding:13px 16px 24px}
+.shb::-webkit-scrollbar{width:0}
+.modal{position:absolute;top:50%;right:18px;left:18px;transform:translateY(-50%);background:#fff;border-radius:19px;padding:22px 20px;animation:pop .25s cubic-bezier(.2,.9,.3,1.1)}
+@keyframes pop{from{opacity:0;transform:translateY(-50%) scale(.94)}to{opacity:1;transform:translateY(-50%) scale(1)}}
+.pd{display:flex;justify-content:center;gap:11px;margin:17px 0}
+.pd i{width:12px;height:12px;border-radius:50%;border:2px solid var(--line);display:block;transition:.15s}
+.pd i.f{background:var(--teal);border-color:var(--teal)}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pad button{padding:13px;border:1px solid var(--line);background:#fff;border-radius:12px;cursor:pointer;font-family:'IBM Plex Mono';font-size:18px;font-weight:600;color:var(--n800)}
+.pad button:active{background:var(--teal-s)}
+.pad button.fn{font-family:'IBM Plex Sans Arabic';font-size:12.5px;color:var(--mut)}
+
+/* ---------- MISC ---------- */
+.empty{text-align:center;padding:42px 24px;color:var(--mut)}
+.empty svg{width:34px;height:34px;color:#B5C6C4;margin-bottom:12px;stroke-width:1.4}
+.empty b{display:block;font-family:'Noto Kufi Arabic';font-size:14px;color:var(--n800);margin-bottom:6px;font-weight:600}
+.empty p{font-size:12.5px;line-height:1.75;margin:0}
+.toast{position:absolute;bottom:76px;right:18px;left:18px;background:var(--n900);color:#fff;padding:13px 16px;border-radius:12px;font-size:12.5px;z-index:99;text-align:center;display:none;animation:up .25s}
+.toast.on{display:block}
+.wave{display:flex;justify-content:center;align-items:flex-end;gap:4px;height:32px;margin:12px 0 4px}
+.wave i{width:4px;background:var(--sand);border-radius:3px;transform-origin:bottom;animation:wv 1.1s ease-in-out infinite}
+@keyframes wv{0%,100%{height:6px;opacity:.4}50%{height:30px;opacity:1}}
+.fbar{display:flex;gap:7px;overflow-x:auto;padding:2px 16px 9px;margin:0 -16px}
+.fbar::-webkit-scrollbar{height:0}
+.fbar .chip{flex:0 0 auto;font-size:12px;padding:7.5px 12px}
+.stars{display:flex;gap:8px;justify-content:center;margin:6px 0 12px}
+.stars button{background:none;border:0;cursor:pointer;padding:3px;color:#D3DDDC}
+.stars button svg{width:31px;height:31px;stroke-width:1.5}
+.stars button.on{color:var(--sand)}
+.stars button.on svg{fill:var(--sand)}
+.pledge{display:flex;gap:11px;padding:11px 0;border-bottom:1px dashed #EBF0EF}
+.pledge:last-child{border:0}
+.pledge .n2{font-family:'IBM Plex Mono';font-size:11.5px;color:var(--sand);font-weight:600;flex:0 0 auto;padding-top:2px}
+.pledge b{color:var(--n800);display:block;margin-bottom:2px;font-size:13px}
+.pledge div{font-size:12.5px;line-height:1.7;color:#3A4E51}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+
+#netbar{position:absolute;top:0;right:0;left:0;z-index:150;background:var(--clay);color:#fff;
+ font-size:11.5px;text-align:center;padding:7px 12px;display:none;font-weight:500}
+#netbar.on{display:block}
+#netbar.sync{background:var(--sand);color:var(--n900)}
+#updbar{position:absolute;bottom:74px;right:14px;left:14px;z-index:150;background:var(--n800);color:#fff;
+ border-radius:12px;padding:12px 14px;display:none;align-items:center;gap:10px;font-size:12.5px}
+#updbar.on{display:flex}
+#updbar button{margin-inline-start:auto;background:var(--sand);color:var(--n900);border:0;border-radius:8px;
+ padding:7px 13px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer}
+#instBtn{display:none}
+
+/* ---------- PRINT ---------- */
+#print{display:none}
+@media print{
+  body>#app{display:none}
+  #print{display:block;padding:24px;font-family:'IBM Plex Sans Arabic'}
+  #print h1{font-family:'Noto Kufi Arabic';font-size:20px;margin:0 0 4px}
+  #print .sub{font-size:12px;color:#555;margin-bottom:18px;border-bottom:2px solid #0A343A;padding-bottom:10px}
+  #print table{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px}
+  #print th,#print td{border:1px solid #ccc;padding:6px 8px;text-align:right}
+  #print th{background:#F1F5F4}
+  #print h2{font-size:14px;margin:20px 0 6px}
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div id="splash">
+    <div class="crest"><svg viewBox="0 0 24 24" style="width:38px;height:38px"><path d="M4 12h2.5l2-5.5L12 18l2.5-6H20"/><path d="M12 3v2M12 19v2"/></svg></div>
+    <h1>مسموع</h1>
+    <div class="ln"></div>
+    <p>مستشفى الدمازين التعليمي<br>ولاية النيل الأزرق — جمهورية السودان</p>
+  </div>
+
+  <header>
+    <div class="hd">
+      <div class="mark"><svg viewBox="0 0 24 24"><path d="M4 12h2.5l2-5.5L12 18l2.5-6H20"/></svg></div>
+      <div style="flex:1;min-width:0">
+        <div class="bn">مسموع</div>
+        <div class="bs">مستشفى الدمازين التعليمي</div>
+      </div>
+      <button class="ibtn" id="instBtn" title="تثبيت التطبيق"><svg viewBox="0 0 24 24"><path d="M12 4v11M8 11l4 4 4-4M5 20h14"/></svg></button>
+      
+    </div>
+    <div class="ttl">
+      <h1 id="hT">صوتك يصل إلى الإدارة</h1>
+      <p id="hS">بلّغ عن أي ملاحظة داخل المستشفى وتابع حالتها بالرقم</p>
+      <div id="rolePill"></div>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- NEW -->
+    <section class="scr on" id="s-new">
+      <div class="lbl">الجهة المعنية بالبلاغ</div>
+      <div id="typeGrid" class="grid2" style="gap:8px"></div>
+
+      <div class="lbl">طبيعة الرسالة</div>
+      <div class="chips" id="catChips"></div>
+
+      <div class="lbl">درجة الأهمية</div>
+      <div class="chips" id="priChips"></div>
+      <p class="hint" id="slaHint"></p>
+
+      <div class="lbl">تفاصيل البلاغ</div>
+      <div class="card">
+        <label class="fl">القسم أو الجناح <span>— اختياري</span></label>
+        <select id="fDept"></select>
+        <div style="height:13px"></div>
+        <label class="fl">وقت وقوع الحادثة <span>— اختياري</span></label>
+        <select id="fWhen">
+          <option>الآن / خلال الساعة الماضية</option>
+          <option>اليوم</option>
+          <option>أمس</option>
+          <option>خلال الأسبوع الماضي</option>
+          <option>متكرر ومستمر</option>
+        </select>
+        <div style="height:13px"></div>
+        <label class="fl">اشرح ما حدث</label>
+        <textarea id="fText" placeholder="اكتب بالتفصيل: ماذا حدث؟ متى؟ ومن كان موجوداً إن أمكن…"></textarea>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:7px">
+          <p class="hint" style="margin:0">تجنّب ذكر بيانات طبية عن مرضى آخرين.</p>
+          <span class="mono" id="cnt" style="font-size:10.5px;color:var(--mut)">0</span>
+        </div>
+      </div>
+
+      <div class="lbl">مرفق مصوّر</div>
+      <div class="card" style="padding:12px">
+        <div class="drop" id="pBtn"><svg viewBox="0 0 24 24"><path d="M3 8a2 2 0 0 1 2-2h2.5l1.2-2h6.6L16.5 6H19a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.4"/></svg>إرفاق صورة توضيحية (اختياري)</div>
+        <div class="prev" id="pPrev" style="display:none"><img id="pImg"><button id="pDel">إزالة</button></div>
+        <input type="file" id="pIn" accept="image/*" hidden>
+      </div>
+
+      <div class="lbl">بيانات مقدّم البلاغ</div>
+      <div class="card">
+        <div class="sw" style="padding-top:0">
+          <div>
+            <div style="font-size:13.5px;font-weight:600;color:var(--n800)">بلاغ بدون اسم</div>
+            <div style="font-size:11px;color:var(--mut);margin-top:3px">لن يُطلب منك أي بيانات شخصية</div>
+          </div>
+          <button class="tgl" id="anon"></button>
+        </div>
+        <div id="idF">
+          <div style="height:5px"></div>
+          <label class="fl">الاسم <span>— اختياري</span></label>
+          <input type="text" id="fName" placeholder="الاسم الثلاثي">
+          <div style="height:13px"></div>
+          <div class="grid2">
+            <div>
+              <label class="fl">رقم الهاتف</label>
+              <input type="tel" id="fPhone" placeholder="09XXXXXXXX" inputmode="numeric">
+            </div>
+            <div>
+              <label class="fl">رقم الملف <span>—</span></label>
+              <input type="text" id="fFile" placeholder="اختياري">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:5px"></div>
+      <button class="btn" id="send"><svg viewBox="0 0 24 24"><path d="M21 3 3 10.5l7 3 3 7z"/><path d="M10 13.5 21 3"/></svg>إرسال البلاغ</button>
+      <p class="hint" style="text-align:center">بإرسالك البلاغ توافق على مراجعته من قبل لجنة المتابعة بالمستشفى.</p>
+    </section>
+
+    <!-- MINE -->
+    <section class="scr" id="s-mine"><div id="mineL"></div></section>
+
+    <!-- TRACK -->
+    <section class="scr" id="s-track">
+      <div class="card" style="margin-top:12px">
+        <label class="fl">أدخل رقم البلاغ</label>
+        <input type="text" id="tIn" class="mono" placeholder="MS-260826-001" style="text-align:center;font-size:16px;letter-spacing:1px">
+        <div style="height:11px"></div>
+        <button class="btn dark sm" id="tBtn">عرض حالة البلاغ</button>
+      </div>
+      <div id="tOut"></div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="scr" id="s-about">
+      <div class="card" style="margin-top:12px">
+        <h2 style="font-family:'Noto Kufi Arabic';font-size:15px;font-weight:600;color:var(--n800);margin:0 0 9px">ما هي خدمة مسموع؟</h2>
+        <p style="font-size:13px;line-height:1.85;color:#3A4E51;margin:0 0 11px">قناة رسمية مباشرة بين المريض ومرافقه وبين إدارة مستشفى الدمازين التعليمي. كل بلاغ يصل إلى ضابط المناوبة، يُسجَّل برقم مرجعي، ويُتابَع حتى الإغلاق.</p>
+        <p style="font-size:13px;line-height:1.85;color:#3A4E51;margin:0">تستقبل الخدمة الشكوى والاقتراح والاستفسار وكلمة الشكر على حدٍّ سواء.</p>
+      </div>
+      <div class="lbl">التزامنا تجاه بلاغك</div>
+      <div class="card">
+        <div class="pledge"><div class="n2">٠١</div><div><b>رقم مرجعي فوري</b>تستلم رقم بلاغ فور الإرسال، وبه تتابع حالته في أي وقت.</div></div>
+        <div class="pledge"><div class="n2">٠٢</div><div><b>سرية تامة</b>بياناتك لا تُعرض إلا على لجنة المتابعة، ويمكنك البلاغ دون اسم.</div></div>
+        <div class="pledge"><div class="n2">٠٣</div><div><b>زمن استجابة محدد</b>حرج: ساعتان · عاجل: ٨ ساعات · عادي: ٤٨ ساعة.</div></div>
+        <div class="pledge"><div class="n2">٠٤</div><div><b>لا ضرر</b>تقديم البلاغ لا يؤثر إطلاقاً على الخدمة الطبية المقدمة لك.</div></div>
+        <div class="pledge"><div class="n2">٠٥</div><div><b>تقييمك يُحتسب</b>بعد المعالجة تُطلب منك درجة رضا تدخل ضمن مؤشرات الجودة.</div></div>
+      </div>
+      <div class="lbl">قنوات أخرى</div>
+      <div class="card">
+        <div class="kv"><span class="k">مكتب ضابط المناوبة</span><span class="v">الدور الأرضي — بجوار الاستقبال</span></div>
+        <div class="kv"><span class="k">صناديق مسموع</span><span class="v">موزعة على الأقسام</span></div>
+        <div class="kv"><span class="k">ساعات العمل</span><span class="v">٢٤ ساعة طوال الأسبوع</span></div>
+      </div>
+      <p class="hint" style="text-align:center;margin-top:16px">مسموع · إدارة مستشفى الدمازين التعليمي · الإصدار ٢٫٠</p>
+    </section>
+
+    <!-- DASH -->
+    
+    
+    
+
+  <nav id="nav"></nav>
+  <div id="netbar"></div>
+  <div id="updbar"><span>يتوفر إصدار أحدث من التطبيق</span><button id="updBtn">تحديث</button></div>
+  <div class="toast" id="toast"></div>
+
+  <div class="ov" id="ovD"><div class="sh" style="height:90%"><div class="shh"><div class="grab"></div><div id="dH"></div></div><div class="shb" id="dB"></div></div></div>
+  <div class="ov" id="ovOk"><div class="sh" style="height:auto"><div class="shb" style="padding:20px 18px 26px" id="okB"></div></div></div>
+  <div class="ov" id="ovP"><div class="modal">
+    <div style="text-align:center">
+      <div style="width:46px;height:46px;border-radius:14px;background:var(--teal-s);color:var(--teal-d);display:grid;place-items:center;margin:0 auto"><svg viewBox="0 0 24 24" style="width:22px;height:22px"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+      <div style="font-family:'Noto Kufi Arabic';font-weight:600;font-size:15.5px;margin-top:10px;color:var(--n800)">دخول لوحة الإدارة</div>
+      <div style="font-size:11.5px;color:var(--mut);margin-top:5px">أدخل الرمز المكوّن من ٤ أرقام</div>
+    </div>
+    <div class="pd" id="pdots"><i></i><i></i><i></i><i></i></div>
+    <div class="pad" id="pad"></div>
+    <div style="height:9px"></div>
+    <button class="btn ghost sm" id="pCancel">إلغاء</button>
+  </div></div>
+</div>
+
+<div id="print"></div>
+
+<script>
+
+
+/* ================= هوية النسخة ================= */
+const BUILD='patient';            // 'patient' أو 'admin'
+const APP_TITLE=BUILD==='admin'?'مسموع | الإدارة':'مسموع';
+
+/* ================= الاتصال بالخادم ================= */
+const Auth={
+  get token(){return localStorage.getItem('masmoo:token')||''},
+  set token(v){v?localStorage.setItem('masmoo:token',v):localStorage.removeItem('masmoo:token')},
+  get who(){try{return JSON.parse(localStorage.getItem('masmoo:who')||'null')}catch(e){return null}},
+  set who(v){v?localStorage.setItem('masmoo:who',JSON.stringify(v)):localStorage.removeItem('masmoo:who')}
+};
+
+const API={
+  ok(){return !!CONFIG.apiBase},
+  async call(path,opt){
+    if(!this.ok())return null;
+    const o=Object.assign({headers:{}},opt||{});
+    o.headers['Content-Type']='application/json';
+    if(Auth.token)o.headers['Authorization']='Bearer '+Auth.token;
+    const ctrl=new AbortController();const t=setTimeout(()=>ctrl.abort(),12000);
+    try{
+      const res=await fetch(CONFIG.apiBase+path,Object.assign({signal:ctrl.signal},o));
+      clearTimeout(t);
+      if(res.status===401){Auth.token='';Auth.who=null;return null}
+      if(!res.ok)return null;
+      return await res.json();
+    }catch(e){clearTimeout(t);return null}
+  },
+  get(p){return this.call(p)},
+  post(p,b){return this.call(p,{method:'POST',body:JSON.stringify(b)})}
+};
+
+/* ================= التخزين والمزامنة ================= */
+const Store={
+  persist(){try{localStorage.setItem(K,JSON.stringify(R));localStorage.setItem(KM,JSON.stringify(MY))}catch(e){}},
+  loadLocal(){
+    try{R=JSON.parse(localStorage.getItem(K)||'[]')}catch(e){R=[]}
+    try{MY=JSON.parse(localStorage.getItem(KM)||'[]')}catch(e){MY=[]}
+  },
+  merge(rep){
+    const i=R.findIndex(x=>x.num===rep.num);
+    if(i<0)R.unshift(rep);else R[i]=rep;
+  },
+  /* المريض: يرسل بلاغه ثم يحدّث نسخته */
+  async submit(rep){
+    R.unshift(rep);MY.unshift(rep.num);this.persist();
+    const res=await API.post('/reports',rep);
+    if(!res){Outbox.add(rep);Net.show('البلاغ محفوظ على جهازك وسيُرسل تلقائياً عند عودة الشبكة');setTimeout(()=>Net.hide(),5000)}
+  },
+  /* الضابط: يحدّث حالة البلاغ على الخادم */
+  async update(rep){
+    this.persist();
+    if(BUILD!=='admin')return this.persist();
+    const res=await API.post('/reports/'+encodeURIComponent(rep.num)+'/status',{
+      status:rep.status,assignee:rep.assignee,rating:rep.rating,
+      note:(rep.timeline[rep.timeline.length-1]||{}).note||'',
+      by:(Auth.who&&Auth.who.name)||'ضابط المناوبة'});
+    if(!res){Net.show('تعذّر إرسال التحديث للخادم — سيُعاد إرساله لاحقاً');setTimeout(()=>Net.hide(),5000)}
+  },
+  /* جلب المستجدات */
+  async refresh(silent){
+    if(!API.ok()||!navigator.onLine)return;
+    if(BUILD==='admin'){
+      if(!Auth.token)return;
+      const d=await API.get('/reports');
+      if(Array.isArray(d)){
+        const before=new Set(R.map(x=>x.num));
+        const fresh=d.filter(x=>!before.has(x.num));
+        R=d;this.persist();
+        if(fresh.length&&!silent)Alert.fire(fresh);
+        refreshViews();
+      }
+    }else{
+      let changed=false;
+      for(const n of MY.slice(0,40)){
+        const d=await API.get('/reports/'+encodeURIComponent(n));
+        if(d&&d.num){this.merge(d);changed=true}
+      }
+      if(changed){this.persist();refreshViews()}
+    }
+  }
+};
+
+/* البلاغات غير المرسلة */
+const Outbox={
+  key:'masmoo:outbox',
+  all(){try{return JSON.parse(localStorage.getItem(this.key)||'[]')}catch(e){return[]}},
+  add(r){const a=this.all();if(!a.find(x=>x.num===r.num)){a.push(r);localStorage.setItem(this.key,JSON.stringify(a))}},
+  async flush(){
+    if(!API.ok()||!navigator.onLine)return;
+    const a=this.all();if(!a.length)return;
+    const rest=[];
+    for(const r of a){const ok=await API.post('/reports',r);if(!ok)rest.push(r)}
+    localStorage.setItem(this.key,JSON.stringify(rest));
+    if(a.length&&!rest.length){toast('تم إرسال البلاغات المؤجَّلة');Store.refresh(true)}
+  }
+};
+
+function refreshViews(){
+  const s=document.querySelector('.scr.on');if(!s)return;
+  if(s.id==='s-dash')dash();if(s.id==='s-list')list();
+  if(s.id==='s-mine')mine();if(s.id==='s-rep')rep();
+  nav();
+}
+
+/* ================= تنبيه البلاغ الجديد (للضابط) ================= */
+const Alert={
+  beep(){
+    try{
+      const c=new (window.AudioContext||window.webkitAudioContext)();
+      [0,0.22].forEach(d=>{
+        const o=c.createOscillator(),g=c.createGain();
+        o.connect(g);g.connect(c.destination);
+        o.frequency.value=d?760:520;o.type='sine';
+        g.gain.setValueAtTime(0.0001,c.currentTime+d);
+        g.gain.exponentialRampToValueAtTime(0.25,c.currentTime+d+0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+d+0.2);
+        o.start(c.currentTime+d);o.stop(c.currentTime+d+0.22);
+      });
+    }catch(e){}
+  },
+  fire(list){
+    this.beep();
+    if(navigator.vibrate)navigator.vibrate([180,90,180]);
+    const urgent=list.filter(r=>r.pri!=='عادي').length;
+    const msg=list.length===1
+      ? `بلاغ جديد ${list[0].num} — ${list[0].type}`
+      : `${list.length} بلاغات جديدة${urgent?` منها ${urgent} عاجل`:''}`;
+    toast(msg);
+    if('Notification'in window&&Notification.permission==='granted'){
+      try{new Notification('مسموع — بلاغ جديد',{body:msg,icon:'icons/icon-192.png',tag:'masmoo-new'})}catch(e){}
+    }
+  }
+};
+
+/* ================= الإشعارات الفورية ================= */
+const Push={
+  async enable(){
+    if(BUILD!=='admin'||!API.ok())return;
+    if(!('Notification'in window)||!('serviceWorker'in navigator))return;
+    let p=Notification.permission;
+    if(p==='default')p=await Notification.requestPermission();
+    if(p!=='granted'){toast('لن تصلك إشعارات — فعّلها من إعدادات الهاتف');return}
+    try{
+      const cfg=await API.get('/push/key');
+      if(!cfg||!cfg.publicKey)return;
+      const reg=await navigator.serviceWorker.ready;
+      let sub=await reg.pushManager.getSubscription();
+      if(!sub){
+        sub=await reg.pushManager.subscribe({
+          userVisibleOnly:true,
+          applicationServerKey:b64ToU8(cfg.publicKey)
+        });
+      }
+      await API.post('/push/subscribe',{subscription:sub.toJSON(),
+        device:(Auth.who&&Auth.who.name)||'جهاز الضابط'});
+      toast('تم تفعيل الإشعارات على هذا الجهاز');
+    }catch(e){}
+  }
+};
+function b64ToU8(s){
+  const pad='='.repeat((4-s.length%4)%4);
+  const b=(s+pad).replace(/-/g,'+').replace(/_/g,'/');
+  const raw=atob(b);const arr=new Uint8Array(raw.length);
+  for(let i=0;i<raw.length;i++)arr[i]=raw.charCodeAt(i);
+  return arr;
+}
+
+/* ============ إعدادات النشر ============ */
+const CONFIG={
+  apiBase:'/api',                 // مثال: 'https://hospital.example.sd/api'  — اتركه فارغاً للعمل محلياً فقط
+  hospital:'مستشفى الدمازين التعليمي',
+  version:'2.0.0'
+};
+
+/* ============ التخزين المحلي (يعمل دون اتصال) ============ */
+if(!window.storage){
+  window.storage={
+    async get(k){const v=localStorage.getItem(k);if(v===null)throw new Error('not found');return{key:k,value:v}},
+    async set(k,v){localStorage.setItem(k,v);return{key:k,value:v}},
+    async delete(k){localStorage.removeItem(k);return{key:k,deleted:true}},
+    async list(p){return{keys:Object.keys(localStorage).filter(k=>!p||k.startsWith(p))}}
+  };
+}
+
+/* ============ المزامنة مع خادم المستشفى ============ */
+const Sync={
+  t:null, busy:false,
+  schedule(){clearTimeout(this.t);this.t=setTimeout(()=>this.run(),1200)},
+  async run(){
+    if(!CONFIG.apiBase||this.busy||!navigator.onLine)return;
+    this.busy=true;Net.show('جارٍ المزامنة مع خادم المستشفى…','sync');
+    try{
+      const raw=localStorage.getItem('masmoo:v2:reports');
+      const res=await fetch(CONFIG.apiBase+'/sync',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:raw||'[]'
+      });
+      if(!res.ok)throw new Error('http '+res.status);
+      const merged=await res.json();
+      if(Array.isArray(merged)){
+        localStorage.setItem('masmoo:v2:reports',JSON.stringify(merged));
+        if(typeof R!=='undefined'){R=merged;const s=document.querySelector('.scr.on');
+          if(s&&s.id==='s-dash')dash();if(s&&s.id==='s-list')list();if(s&&s.id==='s-mine')mine();nav()}
+      }
+      Net.hide();
+    }catch(e){
+      Net.show('تعذّرت المزامنة — البلاغات محفوظة على الجهاز وستُرسل تلقائياً');
+      setTimeout(()=>Net.hide(),4000);
+      if('serviceWorker'in navigator&&'SyncManager'in window){
+        try{const reg=await navigator.serviceWorker.ready;await reg.sync.register('masmoo-sync')}catch(_){}
+      }
+    }finally{this.busy=false}
+  }
+};
+
+/* ============ حالة الشبكة ============ */
+const Net={
+  el:null,
+  init(){this.el=document.getElementById('netbar');
+    addEventListener('online',()=>{this.hide();Sync.run()});
+    addEventListener('offline',()=>this.show('لا يوجد اتصال — البلاغات تُحفظ على الجهاز وتُرسل عند عودة الشبكة'));
+    if(!navigator.onLine)this.show('لا يوجد اتصال — البلاغات تُحفظ على الجهاز وتُرسل عند عودة الشبكة')},
+  show(m,c){if(!this.el)return;this.el.textContent=m;this.el.className='on'+(c?' '+c:'')},
+  hide(){if(this.el)this.el.className=''}
+};
+
+/* ============ عامل الخدمة والتحديث ============ */
+if('serviceWorker' in navigator){
+  addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').then(reg=>{
+      reg.addEventListener('updatefound',()=>{
+        const w=reg.installing;if(!w)return;
+        w.addEventListener('statechange',()=>{
+          if(w.state==='installed'&&navigator.serviceWorker.controller){
+            const b=document.getElementById('updbar');b.classList.add('on');
+            document.getElementById('updBtn').onclick=()=>{w.postMessage('SKIP_WAITING');location.reload()};
+          }});
+      });
+      setInterval(()=>reg.update(),36e5);
+    }).catch(()=>{});
+    navigator.serviceWorker.addEventListener('message',e=>{if(e.data==='SYNC_NOW')Sync.run()});
+  });
+}
+
+/* ============ تثبيت التطبيق ============ */
+let deferred=null;
+addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();deferred=e;
+  const b=document.getElementById('instBtn');if(b)b.style.display='grid';
+});
+addEventListener('appinstalled',()=>{const b=document.getElementById('instBtn');if(b)b.style.display='none'});
+document.addEventListener('DOMContentLoaded',()=>{
+  const b=document.getElementById('instBtn');
+  if(b)b.onclick=async()=>{if(!deferred)return;deferred.prompt();await deferred.userChoice;deferred=null;b.style.display='none'};
+});
+
+/* ================= CONFIG ================= */
+const PINS={'2026':{n:'ضابط المناوبة',r:'officer'},'1970':{n:'مدير المستشفى',r:'director'}};
+const K='masmoo:v2:reports', KM='masmoo:v2:mine';
+
+const I={
+ pulse:'M4 12h2.5l2-5.5L12 18l2.5-6H20',
+ steth:'M6 3v5a5 5 0 0 0 10 0V3M6 3H4M16 3h2M16 13v1a5 5 0 0 1-10 0M18 13a2 2 0 1 1 0 4 2 2 0 0 1 0-4',
+ amb:'M3 17V9a2 2 0 0 1 2-2h9v10M14 11h4l3 3v3h-3M7 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4M17 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4M8.5 9.5v3M7 11h3',
+ pill:'M10.5 20.5 3.5 13.5a5 5 0 0 1 7-7l7 7a5 5 0 0 1-7 7ZM7 10l7 7',
+ flask:'M9 3v6l-5 9a2 2 0 0 0 1.8 3h12.4A2 2 0 0 0 20 18l-5-9V3M8 3h8M6.5 15h11',
+ drop:'M12 3s6 6.3 6 10.2A6 6 0 0 1 6 13.2C6 9.3 12 3 12 3Z',
+ bowl:'M3.5 12h17a8.5 8.5 0 0 1-17 0ZM12 4v3.5M9 5.5v2M15 5.5v2',
+ rcpt:'M6 3h12v18l-3-2-3 2-3-2-3 2ZM9.5 8h5M9.5 12h5',
+ shield:'M12 3l8 3v6c0 5-3.4 8-8 9-4.6-1-8-4-8-9V6Z',
+ pin:'M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11ZM12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5',
+ star:'M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.7l5.9-.8Z',
+ box:'M4 7.5 12 3l8 4.5v9L12 21l-8-4.5ZM4 7.5 12 12l8-4.5M12 12v9',
+ search:'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM21 21l-4.3-4.3',
+ check:'M20 6 9 17l-5-5'
+};
+const TYPES=[
+ {n:'التمريض',i:'pulse'},{n:'الأطباء',i:'steth'},{n:'الاستقبال والطوارئ',i:'amb'},
+ {n:'الصيدلية والدواء',i:'pill'},{n:'المعمل والأشعة',i:'flask'},{n:'النظافة والبيئة',i:'drop'},
+ {n:'التغذية',i:'bowl'},{n:'المالية والرسوم',i:'rcpt'},{n:'الأمن والنظام',i:'shield'},{n:'أخرى',i:'pin'}
+];
+const CATS=['شكوى','اقتراح','استفسار','شكر وتقدير'];
+const PRIS=[{n:'عادي',h:48},{n:'عاجل',h:8},{n:'حرج',h:2}];
+const DEPTS=['— غير محدد —','الطوارئ','الباطنية','الجراحة','الأطفال','النساء والولادة','العناية المكثفة','العيادات الخارجية','المعمل','الأشعة','الصيدلية','الغسيل الكلوي','العمليات','الاستقبال','التنويم'];
+const STS=[{n:'جديد',c:'s0'},{n:'قيد المراجعة',c:'s1'},{n:'محال إلى القسم',c:'s2'},{n:'تمت المعالجة',c:'s3'},{n:'مغلق',c:'s4'}];
+const CLOSED=['تمت المعالجة','مغلق'];
+
+let R=[],MY=[],role=null,cur=null,pin='';
+let F={t:null,c:'شكوى',p:'عادي',img:null};
+let FL={s:'الكل',t:'الكل',o:'الأحدث',q:''};
+
+/* ================= UTIL ================= */
+/* عنصر بديل صامت: يمنع الانهيار عند استدعاء عنصر غير موجود في هذه النسخة */
+const VOID_EL=document.createElement('div');
+const $=s=>document.querySelector(s)||VOID_EL;
+const $$=s=>document.querySelector(s);   // يعيد null فعلياً عند الحاجة للتحقق
+const E=(t,c,h)=>{const x=document.createElement(t);if(c)x.className=c;if(h!=null)x.innerHTML=h;return x};
+const esc=s=>String(s==null?'':s).replace(/[<>&"]/g,m=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[m]));
+const ico=n=>`<svg viewBox="0 0 24 24"><path d="${I[n]||I.pin}"/></svg>`;
+const stC=n=>(STS.find(s=>s.n===n)||{}).c||'s4';
+const slaH=p=>(PRIS.find(x=>x.n===p)||{h:48}).h;
+const tIco=n=>(TYPES.find(t=>t.n===n)||{i:'pin'}).i;
+const p2=n=>String(n).padStart(2,'0');
+const fmt=t=>{const d=new Date(t);return `${p2(d.getDate())}/${p2(d.getMonth()+1)}/${d.getFullYear()} · ${p2(d.getHours())}:${p2(d.getMinutes())}`};
+function ago(t){const m=(Date.now()-t)/6e4;if(m<1)return'الآن';if(m<60)return`قبل ${Math.floor(m)} دقيقة`;
+ const h=m/60;if(h<24)return`قبل ${Math.floor(h)} ساعة`;return`قبل ${Math.floor(h/24)} يوم`}
+function left(r){return r.createdAt+slaH(r.pri)*36e5-Date.now()}
+function isLate(r){return !CLOSED.includes(r.status)&&left(r)<0}
+function slaTag(r){
+  if(CLOSED.includes(r.status))return'';
+  const ms=left(r),a=Math.abs(ms),h=Math.floor(a/36e5),m=Math.floor(a%36e5/6e4);
+  const cls=ms<0?'over':ms<36e5*2?'warn':'';
+  return `<span class="sla ${cls}">${ms<0?'تأخر ':'متبقٍ '}${h}س ${p2(m)}د</span>`;
+}
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),2400)}
+async function save(){Store.persist()}
+async function load(){Store.loadLocal()}
+function newNum(){const d=new Date();const day=`${String(d.getFullYear()).slice(2)}${p2(d.getMonth()+1)}${p2(d.getDate())}`;
+  return `MS-${day}-${String(R.filter(r=>r.num.includes(day)).length+1).padStart(3,'0')}`}
+
+/* ================= NAV ================= */
+const NP=[{id:'s-new',t:'بلاغ جديد',d:'M12 5v14M5 12h14'},
+ {id:'s-mine',t:'بلاغاتي',d:'M4 6h16M4 12h16M4 18h10'},
+ {id:'s-track',t:'تتبع',d:I.search},
+ {id:'s-about',t:'عن الخدمة',d:'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20ZM12 16.5v-5M12 8h.01'}];
+const NS=[{id:'s-dash',t:'اللوحة',d:'M4 13h6V4H4ZM14 20h6v-9h-6ZM14 8h6V4h-6ZM4 20h6v-4H4Z'},
+ {id:'s-list',t:'البلاغات',d:'M4 6h16M4 12h16M4 18h10'},
+ {id:'s-rep',t:'التقارير',d:'M6 20V10M12 20V4M18 20v-6'},
+ {id:'s-new',t:'تسجيل',d:'M12 5v14M5 12h14'}];
+const H={'s-new':['صوتك يصل إلى الإدارة','بلّغ عن أي ملاحظة داخل المستشفى وتابع حالتها بالرقم'],
+ 's-mine':['بلاغاتي','كل ما أرسلته من هذا الجهاز مع حالته المحدّثة'],
+ 's-track':['تتبع بلاغ','أدخل الرقم المرجعي لمعرفة ما وصل إليه بلاغك'],
+ 's-about':['عن خدمة مسموع','كيف تعمل الخدمة، وما الذي نلتزم به'],
+ 's-dash':['لوحة المتابعة','نظرة تنفيذية على حالة البلاغات'],
+ 's-list':['إدارة البلاغات','فرز ومتابعة وتحديث الحالة'],
+ 's-rep':['التقارير والتصدير','ملخصات جاهزة للرفع للإدارة']};
+function nav(){
+  const n=$('#nav');n.innerHTML='';
+  NP.forEach(i=>{const b=E('button');
+    let c='';
+    if(role&&i.id==='s-list'){const k=R.filter(r=>r.status==='جديد').length;if(k)c=`<span class="cnt">${k}</span>`}
+    b.innerHTML=`${c}<svg viewBox="0 0 24 24"><path d="${i.d}"/></svg><span>${i.t}</span>`;
+    b.onclick=()=>go(i.id);n.appendChild(b)});
+}
+function go(id){
+  document.querySelectorAll('.scr').forEach(s=>s.classList.toggle('on',s.id===id));
+  const L=NP;[...$('#nav').children].forEach((b,i)=>b.classList.toggle('on',L[i].id===id));
+  const h=H[id]||H['s-new'];$('#hT').textContent=h[0];$('#hS').textContent=h[1];
+  $('#main').scrollTop=0;
+  if(id==='s-mine')mine();if(id==='s-dash')dash();if(id==='s-list')list();if(id==='s-rep')rep();
+}
+
+/* ================= FORM ================= */
+function buildForm(){
+  const g=$('#typeGrid');g.innerHTML='';
+  TYPES.forEach(t=>{const b=E('button','opt',`${ico(t.i)}<span>${t.n}</span>`);
+    b.onclick=()=>{F.t=t.n;[...g.children].forEach(c=>c.classList.remove('on'));b.classList.add('on')};g.appendChild(b)});
+  const c=$('#catChips');c.innerHTML='';
+  CATS.forEach(x=>{const b=E('button','chip'+(x==='شكوى'?' on':''),x);
+    b.onclick=()=>{F.c=x;[...c.children].forEach(y=>y.classList.remove('on'));b.classList.add('on')};c.appendChild(b)});
+  const p=$('#priChips');p.innerHTML='';
+  PRIS.forEach(x=>{const b=E('button','chip'+(x.n==='عادي'?' p-on':''),x.n);b.dataset.v=x.n;
+    b.onclick=()=>{F.p=x.n;[...p.children].forEach(y=>y.classList.remove('p-on'));b.classList.add('p-on');
+      $('#slaHint').textContent=`زمن الاستجابة المستهدف لهذه الدرجة: ${x.h} ساعة.`};p.appendChild(b)});
+  $('#slaHint').textContent='زمن الاستجابة المستهدف لهذه الدرجة: 48 ساعة.';
+  $('#fDept').innerHTML=DEPTS.map(d=>`<option>${d}</option>`).join('');
+}
+$('#anon').onclick=function(){this.classList.toggle('on');$('#idF').style.display=this.classList.contains('on')?'none':'block'};
+$('#fText').oninput=e=>$('#cnt').textContent=e.target.value.length;
+$('#pBtn').onclick=()=>$('#pIn').click();
+$('#pDel').onclick=()=>{F.img=null;$('#pPrev').style.display='none';$('#pBtn').style.display='flex'};
+$('#pIn').onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();
+ rd.onload=()=>{const im=new Image();im.onload=()=>{const mx=540,s=Math.min(1,mx/Math.max(im.width,im.height));
+  const cv=document.createElement('canvas');cv.width=im.width*s;cv.height=im.height*s;
+  cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);F.img=cv.toDataURL('image/jpeg',.55);
+  $('#pImg').src=F.img;$('#pPrev').style.display='block';$('#pBtn').style.display='none'};im.src=rd.result};
+ rd.readAsDataURL(f)};
+
+$('#send').onclick=async()=>{
+  const tx=$('#fText').value.trim();
+  if(!F.t){toast('اختر الجهة المعنية بالبلاغ');$('#main').scrollTop=0;return}
+  if(tx.length<10){toast('اكتب تفاصيل أوضح — ١٠ أحرف على الأقل');$('#fText').focus();return}
+  const an=$('#anon').classList.contains('on'),dp=$('#fDept').value;
+  const r={num:newNum(),type:F.t,cat:F.c,pri:F.p,dept:dp.startsWith('—')?'':dp,when:$('#fWhen').value,
+    text:tx,photo:F.img,name:an?'':$('#fName').value.trim(),phone:an?'':$('#fPhone').value.trim(),
+    file:an?'':$('#fFile').value.trim(),anon:an,createdAt:Date.now(),status:'جديد',assignee:'',rating:0,
+    timeline:[{status:'جديد',note:'تم استلام البلاغ وتسجيله آلياً في السجل المركزي.',at:Date.now(),by:'النظام'}]};
+  await Store.submit(r);
+  try{await window.storage.set(KM,JSON.stringify(MY),false)}catch(e){}
+  $('#fText').value='';$('#cnt').textContent='0';$('#fName').value='';$('#fPhone').value='';$('#fFile').value='';
+  F.img=null;$('#pPrev').style.display='none';$('#pBtn').style.display='flex';nav();ok(r);
+};
+function ok(r){
+  $('#okB').innerHTML=`<div class="grab"></div>
+   <div class="wave">${[0,.1,.2,.3,.4,.5,.6].map(d=>`<i style="animation-delay:${d}s"></i>`).join('')}</div>
+   <div style="text-align:center;margin-bottom:15px">
+     <div style="font-family:'Noto Kufi Arabic';font-size:17.5px;font-weight:800;color:var(--n800)">وصل صوتك</div>
+     <div style="font-size:12px;color:var(--mut);margin-top:6px">احتفظ بالرقم المرجعي لمتابعة بلاغك</div></div>
+   <div class="tk"><div class="tk-t"><div class="l">الرقم المرجعي</div><div class="c">${r.num}</div></div>
+   <div class="notch"><i></i></div><div class="tk-b">
+     <div class="kv"><span class="k">الجهة</span><span class="v">${esc(r.type)}</span></div>
+     <div class="kv"><span class="k">الأهمية</span><span class="v">${esc(r.pri)}</span></div>
+     <div class="kv"><span class="k">وقت التسجيل</span><span class="v mono">${fmt(r.createdAt)}</span></div>
+     <div class="kv"><span class="k">الرد المتوقع خلال</span><span class="v">${slaH(r.pri)} ساعة</span></div></div></div>
+   <button class="btn sm" id="okC">نسخ الرقم المرجعي</button><div style="height:8px"></div>
+   <button class="btn ghost sm" id="okX">تم</button>`;
+  $('#ovOk').classList.add('on');
+  $('#okC').onclick=()=>{navigator.clipboard?.writeText(r.num);toast('تم نسخ الرقم')};
+  $('#okX').onclick=()=>{$('#ovOk').classList.remove('on');go('s-mine')};
+}
+
+/* ================= ITEM ================= */
+function item(r){
+  return `<div class="it" data-p="${esc(r.pri)}" data-n="${esc(r.num)}">
+   <div class="ih"><span class="ic">${esc(r.num)}</span><span class="st ${stC(r.status)}">${esc(r.status)}</span></div>
+   <div class="ix">${esc(r.text)}</div>
+   <div class="im"><span class="tag">${ico(tIco(r.type))}${esc(r.type)}</span>
+   ${r.dept?`<span class="tag">${esc(r.dept)}</span>`:''}
+   ${isLate(r)?'<span class="late">تجاوز الزمن</span>':slaTag(r)}
+   ${r.rating?`<span class="tag">${ico('star')}${r.rating}/5</span>`:''}
+   <span style="margin-inline-start:auto">${ago(r.createdAt)}</span></div></div>`;
+}
+const bind=n=>n.querySelectorAll('.it').forEach(x=>x.onclick=()=>open(x.dataset.n));
+const emp=(t,s,i)=>`<div class="empty">${ico(i)}<b>${t}</b><p>${s}</p></div>`;
+
+function mine(){
+  const l=R.filter(r=>MY.includes(r.num));const c=$('#mineL');
+  c.innerHTML=(l.length?`<div class="lbl">البلاغات المرسلة من هذا الجهاز</div>`+l.map(item).join('')
+   :emp('لا توجد بلاغات بعد','ابدأ من تبويب «بلاغ جديد». سيظهر كل بلاغ ترسله هنا مع حالته المحدّثة.','box'));
+  bind(c);
+}
+
+/* ================= TRACK ================= */
+$('#tBtn').onclick=()=>{
+  const q=$('#tIn').value.trim().toUpperCase();
+  const r=R.find(x=>x.num.toUpperCase()===q);
+  if(!r){$('#tOut').innerHTML=emp('لم نجد هذا الرقم','تأكد من كتابة الرقم كاملاً كما ظهر عند الإرسال، مثل MS-260826-001.','search');return}
+  $('#tOut').innerHTML=`<div class="lbl">حالة البلاغ</div>
+   <div class="tk"><div class="tk-t"><div class="l">الرقم المرجعي</div><div class="c">${esc(r.num)}</div></div>
+   <div class="notch"><i></i></div><div class="tk-b">
+     <div class="kv"><span class="k">الحالة الحالية</span><span class="st ${stC(r.status)}">${esc(r.status)}</span></div>
+     <div class="kv"><span class="k">الجهة</span><span class="v">${esc(r.type)}</span></div>
+     <div class="kv"><span class="k">التسجيل</span><span class="v mono">${fmt(r.createdAt)}</span></div></div></div>
+   ${rateBox(r)}
+   <div class="lbl">سلسلة المتابعة</div><div class="card">${tl(r)}</div>`;
+  wireRate(r);
+};
+function tl(r){return `<div class="tl">`+r.timeline.map((e,i)=>{
+  const last=i===r.timeline.length-1;
+  return `<div class="ti ${last?'c':'d'}"><b>${esc(e.status)}</b><div class="dt">${fmt(e.at)}</div>
+   ${e.note?`<div class="nt">${esc(e.note)}</div>`:''}<div class="by">${esc(e.by)}</div></div>`}).join('')+`</div>`}
+function rateBox(r){
+  if(!CLOSED.includes(r.status))return'';
+  if(r.rating)return `<div class="card" style="text-align:center"><div style="font-size:12.5px;color:var(--mut);margin-bottom:8px">شكراً لتقييمك</div>
+   <div class="stars">${[1,2,3,4,5].map(i=>`<button class="${i<=r.rating?'on':''}" disabled>${ico('star')}</button>`).join('')}</div></div>`;
+  return `<div class="card" style="text-align:center"><div style="font-size:13px;font-weight:600;color:var(--n800)">ما مدى رضاك عن معالجة بلاغك؟</div>
+   <div style="font-size:11.5px;color:var(--mut);margin-top:5px">تقييمك يدخل ضمن مؤشرات جودة الخدمة</div>
+   <div class="stars" id="stars">${[1,2,3,4,5].map(i=>`<button data-i="${i}">${ico('star')}</button>`).join('')}</div></div>`;
+}
+function wireRate(r){
+  const s=document.querySelector('#stars');if(!s)return;
+  s.querySelectorAll('button').forEach(b=>b.onclick=async()=>{
+    const v=+b.dataset.i;r.rating=v;
+    r.timeline.push({status:r.status,note:`قيّم مقدّم البلاغ الخدمة بـ ${v} من ٥.`,at:Date.now(),by:'مقدّم البلاغ'});
+    await Store.update(r);toast('شكراً — تم تسجيل تقييمك');mine();$('#tBtn').click();
+  });
+}
+
+/* ================= DETAIL ================= */
+function open(num){
+  const r=R.find(x=>x.num===num);if(!r)return;cur=r;
+  $('#dH').innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+   <span class="ic" style="font-size:14px">${esc(r.num)}</span><span class="st ${stC(r.status)}">${esc(r.status)}</span></div>
+   <div style="font-size:11px;color:var(--mut);margin-top:5px">${fmt(r.createdAt)} · ${ago(r.createdAt)} ${isLate(r)?'· <span style="color:var(--clay)">تجاوز الزمن</span>':''}</div>`;
+  let h=`<div class="card">
+   <div class="kv"><span class="k">الجهة</span><span class="v">${esc(r.type)}</span></div>
+   <div class="kv"><span class="k">طبيعة الرسالة</span><span class="v">${esc(r.cat)}</span></div>
+   <div class="kv"><span class="k">الأهمية</span><span class="v">${esc(r.pri)} — ${slaH(r.pri)} ساعة</span></div>
+   ${r.dept?`<div class="kv"><span class="k">القسم</span><span class="v">${esc(r.dept)}</span></div>`:''}
+   ${r.when?`<div class="kv"><span class="k">وقت الحادثة</span><span class="v">${esc(r.when)}</span></div>`:''}
+   ${r.assignee?`<div class="kv"><span class="k">الجهة المسؤولة</span><span class="v">${esc(r.assignee)}</span></div>`:''}
+   ${!CLOSED.includes(r.status)?`<div class="kv"><span class="k">زمن الاستجابة</span>${slaTag(r)}</div>`:''}
+   ${r.rating?`<div class="kv"><span class="k">تقييم المريض</span><span class="v mono">${r.rating}/5</span></div>`:''}</div>
+  <div class="lbl">نص البلاغ</div>
+  <div class="card"><div style="font-size:13.5px;line-height:1.9;color:#3A4E51">${esc(r.text)}</div>
+   ${r.photo?`<div style="height:12px"></div><div class="prev"><img src="${r.photo}"></div>`:''}</div>`;
+
+  if(role){
+    h+=`<div class="lbl">مقدّم البلاغ</div><div class="card">
+     ${r.anon?`<div style="font-size:12.5px;color:var(--mut)">بلاغ بدون اسم — لم يقدّم صاحبه بيانات تعريفية.</div>`:`
+     <div class="kv"><span class="k">الاسم</span><span class="v">${esc(r.name||'لم يُذكر')}</span></div>
+     <div class="kv"><span class="k">الهاتف</span><span class="v mono">${esc(r.phone||'—')}</span></div>
+     ${r.file?`<div class="kv"><span class="k">رقم الملف</span><span class="v mono">${esc(r.file)}</span></div>`:''}`}</div>
+    <div class="lbl">إجراء إداري</div><div class="card">
+     <label class="fl">الحالة الجديدة</label>
+     <select id="dS">${STS.map(s=>`<option ${s.n===r.status?'selected':''}>${s.n}</option>`).join('')}</select>
+     <div style="height:12px"></div>
+     <label class="fl">الجهة المسؤولة <span>— اختياري</span></label>
+     <select id="dA"><option value="">— غير محدد —</option>${DEPTS.slice(1).map(d=>`<option ${d===r.assignee?'selected':''}>${d}</option>`).join('')}</select>
+     <div style="height:12px"></div>
+     <label class="fl">ملاحظة الإجراء المتخذ</label>
+     <textarea id="dN" placeholder="وثّق الإجراء بدقة — هذه الملاحظة تظهر لمقدّم البلاغ." style="min-height:78px"></textarea>
+     <div style="height:12px"></div>
+     <button class="btn sm" id="dSv">${ico('check').replace('<svg','<svg style="width:17px;height:17px"')}حفظ التحديث</button></div>`;
+  }
+  h+=`<div class="lbl">سلسلة المتابعة</div><div class="card">${tl(r)}</div>
+   <div style="height:5px"></div><button class="btn ghost sm" id="dX">إغلاق</button>`;
+  $('#dB').innerHTML=h;$('#dB').scrollTop=0;$('#ovD').classList.add('on');
+  $('#dX').onclick=()=>$('#ovD').classList.remove('on');
+  if(role)$('#dSv').onclick=async()=>{
+    const ns=$('#dS').value,nt=$('#dN').value.trim(),as=$('#dA').value;
+    if(ns===r.status&&!nt&&as===r.assignee){toast('لم تُجرِ أي تغيير');return}
+    r.status=ns;r.assignee=as;
+    r.timeline.push({status:ns,note:nt||(as?`أُحيل البلاغ إلى ${as} لاتخاذ اللازم.`:'تم تحديث حالة البلاغ.'),at:Date.now(),by:PINS[Object.keys(PINS).find(k=>PINS[k].r===role)].n});
+    await Store.update(r);$('#ovD').classList.remove('on');toast('تم تحديث البلاغ');nav();dash();list();
+  };
+}
+$('#ovD').onclick=e=>{if(e.target.id==='ovD')$('#ovD').classList.remove('on')};
+
+/* ================= DASH ================= */
+function dash(){
+  const op=R.filter(r=>!CLOSED.includes(r.status));
+  $('#kT').textContent=R.length;$('#kO').textContent=op.length;
+  $('#kL').textContent=R.filter(isLate).length;
+  const dn=R.filter(r=>CLOSED.includes(r.status));
+  $('#kA').textContent=dn.length?(()=>{const a=dn.reduce((s,r)=>s+(r.timeline[r.timeline.length-1].at-r.createdAt),0)/dn.length/36e5;
+    return a<1?Math.round(a*60)+' د':a.toFixed(1)+' س'})():'—';
+  const rt=R.filter(r=>r.rating);
+  $('#kC').textContent=rt.length?(rt.reduce((s,r)=>s+r.rating,0)/rt.length).toFixed(1)+'/5':'—';
+  $('#kR').textContent=(R.length?Math.round((R.length-op.length)/R.length*100):0)+'%';
+
+  const cs=TYPES.map(t=>({n:t.n,i:t.i,c:R.filter(r=>r.type===t.n).length})).filter(x=>x.c).sort((a,b)=>b.c-a.c);
+  const mx=Math.max(1,...cs.map(c=>c.c));
+  $('#tBars').innerHTML=cs.length?cs.map(c=>`<div class="br"><div class="l3">${ico(c.i)}${c.n}</div>
+   <div class="tr"><div class="fl2" style="width:${c.c/mx*100}%"></div></div><div class="vl">${c.c}</div></div>`).join('')
+   :'<div style="font-size:12.5px;color:var(--mut);text-align:center;padding:10px">لا توجد بيانات بعد.</div>';
+
+  const nm=['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'],ds=[];
+  for(let i=6;i>=0;i--){const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-i);
+    ds.push({l:nm[d.getDay()].slice(0,3),c:R.filter(r=>r.createdAt>=d.getTime()&&r.createdAt<d.getTime()+864e5).length})}
+  const dm=Math.max(1,...ds.map(d=>d.c));
+  $('#spk').innerHTML=ds.map(d=>`<div style="height:${Math.max(6,d.c/dm*100)}%;background:${d.c?'var(--teal)':'#EBF0EF'}"><b>${d.c||''}</b></div>`).join('');
+  $('#spx').innerHTML=ds.map(d=>`<span>${d.l}</span>`).join('');
+
+  const u=op.filter(r=>r.pri!=='عادي'||isLate(r)).sort((a,b)=>left(a)-left(b)).slice(0,6);
+  $('#urg').innerHTML=u.length?u.map(item).join(''):emp('لا شيء عاجل','كل البلاغات العاجلة عولجت ضمن الزمن المستهدف.','check');
+  bind($('#urg'));
+}
+
+/* ================= LIST ================= */
+function filters(){
+  const mk=(el2,arr,key)=>{el2.innerHTML='';arr.forEach(v=>{const b=E('button','chip'+(FL[key]===v?' on':''),v);
+    b.onclick=()=>{FL[key]=v;list()};el2.appendChild(b)})};
+  mk($('#f1'),['الكل',...STS.map(s=>s.n)],'s');
+  mk($('#f2'),['الكل',...TYPES.map(t=>t.n)],'t');
+  mk($('#f3'),['الأحدث','الأقدم','الأولوية','الأقرب لتجاوز الزمن'],'o');
+}
+$('#q').oninput=e=>{FL.q=e.target.value.trim();list()};
+function list(){
+  filters();let l=R.slice();
+  if(FL.s!=='الكل')l=l.filter(r=>r.status===FL.s);
+  if(FL.t!=='الكل')l=l.filter(r=>r.type===FL.t);
+  if(FL.q)l=l.filter(r=>(r.num+' '+r.text+' '+r.dept+' '+r.name).includes(FL.q));
+  if(FL.o==='الأقدم')l.sort((a,b)=>a.createdAt-b.createdAt);
+  else if(FL.o==='الأولوية')l.sort((a,b)=>['حرج','عاجل','عادي'].indexOf(a.pri)-['حرج','عاجل','عادي'].indexOf(b.pri));
+  else if(FL.o==='الأقرب لتجاوز الزمن')l.sort((a,b)=>left(a)-left(b));
+  else l.sort((a,b)=>b.createdAt-a.createdAt);
+  const c=$('#allL');
+  c.innerHTML=l.length?`<div style="font-size:11px;color:var(--mut);margin:4px 2px 10px">${l.length} بلاغ</div>`+l.map(item).join('')
+   :emp('لا توجد نتائج','غيّر الفلاتر أو امسح كلمة البحث لعرض بلاغات أخرى.','search');
+  bind(c);
+}
+
+/* ================= REPORTS ================= */
+function bars(a){const mx=Math.max(1,...a.map(x=>x.c));
+  return a.map(x=>`<div class="br"><div class="l3">${x.n}</div><div class="tr">
+   <div class="fl2" style="width:${x.c/mx*100}%;background:${x.col||'var(--teal)'}"></div></div><div class="vl">${x.c}</div></div>`).join('')}
+function rep(){
+  const op=R.filter(r=>!CLOSED.includes(r.status)).length,la=R.filter(isLate).length;
+  const rt=R.filter(r=>r.rating);
+  $('#rSum').innerHTML=`
+   <div class="kv"><span class="k">إجمالي البلاغات</span><span class="v mono">${R.length}</span></div>
+   <div class="kv"><span class="k">معالجة / مغلقة</span><span class="v mono">${R.length-op}</span></div>
+   <div class="kv"><span class="k">مفتوحة</span><span class="v mono">${op}</span></div>
+   <div class="kv"><span class="k">تجاوزت زمن الاستجابة</span><span class="v mono" style="color:var(--clay)">${la}</span></div>
+   <div class="kv"><span class="k">نسبة الإنجاز</span><span class="v mono">${R.length?Math.round((R.length-op)/R.length*100):0}%</span></div>
+   <div class="kv"><span class="k">مؤشر رضا المرضى</span><span class="v mono">${rt.length?(rt.reduce((s,r)=>s+r.rating,0)/rt.length).toFixed(1)+'/5':'—'}</span></div>`;
+  $('#rSt').innerHTML=bars(STS.map(s=>({n:s.n,c:R.filter(r=>r.status===s.n).length})));
+  $('#rPr').innerHTML=bars(PRIS.map(p=>({n:p.n,c:R.filter(r=>r.pri===p.n).length,
+    col:p.n==='حرج'?'var(--clay)':p.n==='عاجل'?'var(--sand)':'var(--teal)'})));
+  const sl=TYPES.map(t=>{const a=R.filter(r=>r.type===t.n);
+    return {n:t.n,c:a.length?Math.round(a.filter(r=>!isLate(r)).length/a.length*100):0,tot:a.length}}).filter(x=>x.tot);
+  $('#rSla').innerHTML=sl.length?sl.map(x=>`<div class="br"><div class="l3">${x.n}</div>
+   <div class="tr"><div class="fl2" style="width:${x.c}%;background:${x.c>=80?'var(--teal)':x.c>=50?'var(--sand)':'var(--clay)'}"></div></div>
+   <div class="vl">${x.c}%</div></div>`).join('')
+   :'<div style="font-size:12.5px;color:var(--mut);text-align:center;padding:10px">لا توجد بيانات بعد.</div>';
+  $('#dirOnly').style.display=role==='director'?'block':'none';
+}
+$('#printBtn').onclick=()=>{
+  const op=R.filter(r=>!CLOSED.includes(r.status)).length,la=R.filter(isLate).length;
+  const rt=R.filter(r=>r.rating);
+  $('#print').innerHTML=`<h1>تقرير خدمة «مسموع» — بلاغات المرضى</h1>
+   <div class="sub">مستشفى الدمازين التعليمي — ولاية النيل الأزرق · تاريخ التقرير: ${fmt(Date.now())}</div>
+   <h2>الملخص التنفيذي</h2>
+   <table><tr><th>إجمالي البلاغات</th><td>${R.length}</td><th>مفتوحة</th><td>${op}</td></tr>
+   <tr><th>معالجة / مغلقة</th><td>${R.length-op}</td><th>تجاوزت الزمن</th><td>${la}</td></tr>
+   <tr><th>نسبة الإنجاز</th><td>${R.length?Math.round((R.length-op)/R.length*100):0}%</td>
+   <th>مؤشر الرضا</th><td>${rt.length?(rt.reduce((s,r)=>s+r.rating,0)/rt.length).toFixed(1)+'/5':'—'}</td></tr></table>
+   <h2>سجل البلاغات</h2>
+   <table><tr><th>الرقم</th><th>الجهة</th><th>الأهمية</th><th>الحالة</th><th>القسم</th><th>التاريخ</th></tr>
+   ${R.map(r=>`<tr><td>${esc(r.num)}</td><td>${esc(r.type)}</td><td>${esc(r.pri)}</td><td>${esc(r.status)}</td><td>${esc(r.dept||'—')}</td><td>${fmt(r.createdAt)}</td></tr>`).join('')}</table>
+   <p style="margin-top:26px;font-size:11px">توقيع المدير الطبي العام: ........................................</p>`;
+  window.print();
+};
+$('#csvBtn').onclick=()=>{
+  if(!R.length){toast('لا توجد بلاغات للتصدير');return}
+  const hd=['الرقم المرجعي','الجهة','طبيعة الرسالة','الأهمية','القسم','الحالة','الجهة المسؤولة','تاريخ التسجيل','متأخر','التقييم','النص','مقدم البلاغ','الهاتف'];
+  const rows=R.map(r=>[r.num,r.type,r.cat,r.pri,r.dept,r.status,r.assignee,fmt(r.createdAt),isLate(r)?'نعم':'لا',r.rating||'',String(r.text).replace(/\n/g,' '),r.anon?'بدون اسم':r.name,r.phone]);
+  const csv='\uFEFF'+[hd,...rows].map(l=>l.map(c=>`"${String(c==null?'':c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=E('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='masmoo-reports.csv';a.click();toast('تم تجهيز الملف');
+};
+$('#wipeBtn').onclick=async()=>{if(!confirm('سيتم حذف جميع البلاغات نهائياً. متابعة؟'))return;
+  R=[];MY=[];await save();try{await window.storage.set(KM,'[]',false)}catch(e){}
+  dash();list();rep();nav();toast('تم مسح جميع البلاغات')};
+$('#demoBtn').onclick=async()=>{
+  const S=[['التمريض','شكوى','عاجل','الباطنية','تأخر تركيب المحلول الوريدي لوالدتي أكثر من ساعتين رغم مراجعة الطاقم مرتين.'],
+   ['النظافة والبيئة','شكوى','عادي','العيادات الخارجية','دورة المياه المقابلة للعيادات تحتاج تنظيفاً متكرراً خلال اليوم.'],
+   ['الأطباء','شكر وتقدير','عادي','الطوارئ','أشكر طبيب الطوارئ على سرعة استقباله لابني وحسن تعامله معنا.'],
+   ['الصيدلية والدواء','استفسار','عادي','الصيدلية','هل يمكن صرف الدواء المزمن لشهرين بدلاً من شهر واحد؟'],
+   ['الاستقبال والطوارئ','شكوى','حرج','الطوارئ','ازدحام شديد عند مدخل الطوارئ وتأخر في فرز الحالات الحرجة.'],
+   ['المعمل والأشعة','اقتراح','عادي','المعمل','أقترح إرسال نتائج التحاليل عبر رسالة نصية لتقليل الانتظار.'],
+   ['التغذية','شكوى','عادي','الأطفال','وجبة الإفطار وصلت باردة في جناح الأطفال.'],
+   ['المالية والرسوم','استفسار','عاجل','الاستقبال','أحتاج توضيحاً لبنود فاتورة العمليات ولم أجد من يشرحها.'],
+   ['الأمن والنظام','اقتراح','عادي','التنويم','تنظيم أوقات الزيارة يقلل الازدحام داخل العنابر.']];
+  const now=Date.now();
+  S.forEach((s,i)=>{const t=now-Math.floor(Math.random()*6*864e5)-i*36e5;
+   const st=i%3===0?'جديد':i%3===1?'محال إلى القسم':'تمت المعالجة';
+   const tlx=[{status:'جديد',note:'تم استلام البلاغ وتسجيله آلياً في السجل المركزي.',at:t,by:'النظام'}];
+   if(st!=='جديد')tlx.push({status:'قيد المراجعة',note:'راجع ضابط المناوبة البلاغ وصنّفه.',at:t+9e5,by:'ضابط المناوبة'});
+   if(st==='محال إلى القسم')tlx.push({status:'محال إلى القسم',note:`أُحيل البلاغ إلى ${s[3]} لاتخاذ اللازم.`,at:t+18e5,by:'ضابط المناوبة'});
+   if(st==='تمت المعالجة')tlx.push({status:'تمت المعالجة',note:'اتُّخذ الإجراء التصحيحي وأُبلغ مقدّم البلاغ هاتفياً.',at:t+72e5,by:'ضابط المناوبة'});
+   R.push({num:`MS-DEMO-${String(i+1).padStart(3,'0')}`,type:s[0],cat:s[1],pri:s[2],dept:s[3],when:'اليوم',
+    text:s[4],photo:null,name:'',phone:'',file:'',anon:true,createdAt:t,status:st,assignee:s[3],
+    rating:st==='تمت المعالجة'?(i%2?5:4):0,timeline:tlx})});
+  R.sort((a,b)=>b.createdAt-a.createdAt);await save();dash();list();rep();nav();toast('تمت إضافة بيانات تجريبية');
+};
+
+/* ================= PIN ================= */
+window._noLock=(()=>{
+  if(role){role=null;Auth.token='';Auth.who=null;$('#lockBtn').classList.remove('on');$('#rolePill').innerHTML='';nav();go('s-new');toast('تم تسجيل الخروج');return}
+  pin='';dots();$('#ovP').classList.add('on');
+});
+$('#pCancel').onclick=()=>$('#ovP').classList.remove('on');
+const dots=()=>[...$('#pdots').children].forEach((d,i)=>d.classList.toggle('f',i<pin.length));
+function pad(){const p=$('#pad');p.innerHTML='';
+ ['1','2','3','4','5','6','7','8','9','مسح','0','دخول'].forEach(k=>{
+  const b=E('button',(k==='مسح'||k==='دخول')?'fn':'',k);
+  b.onclick=()=>{if(k==='مسح')pin=pin.slice(0,-1);else if(k==='دخول'){chk();return}
+   else if(pin.length<4){pin+=k;if(pin.length===4){dots();setTimeout(chk,180);return}}dots()};
+  p.appendChild(b)})}
+async function chk(){
+  if(API.ok()){
+    const res=await API.post('/login',{code:pin});
+    if(res&&res.token){
+      Auth.token=res.token;Auth.who={name:res.name,role:res.role};
+      role=res.role;$('#ovP').classList.remove('on');
+      $('#rolePill').innerHTML=`<span class="role-pill">${res.name}</span>`;
+      nav();go('s-dash');toast(`أهلاً بك، ${res.name}`);
+      await Store.refresh(true);refreshViews();Push.enable();return;
+    }
+    pin='';dots();toast('الرمز غير صحيح أو الخادم غير متاح');return;
+  }
+  const u=PINS[pin];
+  if(u){role=u.r;Auth.who={name:u.n,role:u.r};$('#ovP').classList.remove('on');
+   $('#rolePill').innerHTML=`<span class="role-pill">${u.n}</span>`;nav();go('s-dash');toast(`أهلاً بك، ${u.n}`)}
+  else{pin='';dots();toast('الرمز غير صحيح')}
+}
+
+/* ================= INIT ================= */
+(async function(){
+  buildForm();pad();nav();await load();Net.init();
+  document.title=APP_TITLE;
+  if(BUILD==='admin'){
+    if(Auth.token){role=(Auth.who&&Auth.who.role)||'officer';
+      $('#lockBtn').classList.add('on');
+      $('#rolePill').innerHTML=`<span class="role-pill">${(Auth.who&&Auth.who.name)||'ضابط المناوبة'}</span>`;
+      nav();go('s-dash');Store.refresh(true).then(refreshViews);Push.enable();
+    }else{nav();go('s-dash');setTimeout(()=>{pin='';dots();$('#ovP').classList.add('on')},1600)}
+  }else{
+    go('s-new');Outbox.flush();Store.refresh(true);
+  }
+  addEventListener('online',()=>{Outbox.flush();Store.refresh(true)});
+  setInterval(()=>{Outbox.flush();Store.refresh()},BUILD==='admin'?20000:120000);
+  navigator.serviceWorker&&navigator.serviceWorker.addEventListener('message',e=>{
+    if(e.data==='SYNC_NOW'||e.data==='NEW_REPORT'){Outbox.flush();Store.refresh()}});
+  if(location.hash==='#track')go('s-track');
+  setTimeout(()=>$('#splash').classList.add('out'),1500);
+  $('#hS').setAttribute('data-v',CONFIG.version);
+  setInterval(()=>{const s=document.querySelector('.scr.on');
+   if(!s)return;if(s.id==='s-dash')dash();if(s.id==='s-list')list();if(s.id==='s-mine')mine()},60000);
+})();
+</script>
+</body>
+</html>
