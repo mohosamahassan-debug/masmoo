@@ -68,7 +68,8 @@ class TL(BaseModel):
     by: str = "النظام"
 
 class Report(BaseModel):
-    num: str
+    num: str = ""
+    cid: str = ""            # معرّف فريد يولّده جهاز المريض
     type: str
     cat: str = "شكوى"
     pri: str = "عادي"
@@ -101,7 +102,7 @@ class SubIn(BaseModel):
     device: str = ""
 
 def to_dict(r) -> dict:
-    return {"num": r["num"], "type": r["type"], "cat": r["cat"], "pri": r["pri"],
+    return {"num": r["num"], "cid": r["cid"] or "", "type": r["type"], "cat": r["cat"], "pri": r["pri"],
             "dept": r["dept"] or "", "when": r["when_"] or "", "text": r["text"],
             "photo": r["photo"], "name": r["name"] or "", "phone": r["phone"] or "",
             "file": r["file"] or "", "anon": bool(r["anon"]), "createdAt": r["created_at"],
@@ -110,7 +111,7 @@ def to_dict(r) -> dict:
 
 def public_view(d: dict) -> dict:
     """ما يراه المريض عن بلاغه — بلا بيانات إدارية داخلية."""
-    return {k: d[k] for k in ("num", "type", "cat", "pri", "dept", "when", "text",
+    return {k: d[k] for k in ("num", "cid", "type", "cat", "pri", "dept", "when", "text",
                               "createdAt", "status", "assignee", "rating", "timeline")}
 
 # --------------------------------------------------------------- المصادقة
@@ -186,20 +187,32 @@ def logout(authorization: str = Header(default="")):
         con.execute("DELETE FROM sessions WHERE token=?", (tok,))
     return {"ok": True}
 
+def next_num(con) -> str:
+    """يمنح رقماً مرجعياً فريداً — الخادم وحده مسؤول عن الترقيم."""
+    day = datetime.datetime.now().strftime("%y%m%d")
+    row = con.execute("SELECT num FROM reports WHERE num LIKE ? ORDER BY num DESC LIMIT 1",
+                      (f"MS-{day}-%",)).fetchone()
+    seq = int(row["num"].split("-")[-1]) + 1 if row else 1
+    return f"MS-{day}-{seq:03d}"
+
 # ---- المريض: إنشاء بلاغ (بلا مصادقة) ----
 @app.post("/api/reports")
 def create(rep: Report):
     d = rep.model_dump()
     last = max([t["at"] for t in d["timeline"]] or [d["createdAt"]])
     with db() as con:
-        exists = con.execute("SELECT num FROM reports WHERE num=?", (d["num"],)).fetchone()
-        if exists:
-            return {"ok": True, "num": d["num"], "duplicate": True}
+        # إعادة إرسال البلاغ نفسه لا تُنشئ نسخة ثانية
+        if d.get("cid"):
+            same = con.execute("SELECT num FROM reports WHERE cid=?", (d["cid"],)).fetchone()
+            if same:
+                return {"ok": True, "num": same["num"], "duplicate": True}
+        # الرقم يُمنح هنا، لا على جهاز المريض — وإلا تضاربت أرقام الأجهزة
+        d["num"] = next_num(con)
         con.execute("""INSERT INTO reports
-            (num,type,cat,pri,dept,when_,text,photo,name,phone,file,anon,
+            (num,cid,type,cat,pri,dept,when_,text,photo,name,phone,file,anon,
              created_at,status,assignee,rating,timeline,updated_at)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
-            (d["num"], d["type"], d["cat"], d["pri"], d["dept"], d["when"], d["text"],
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+            (d["num"], d.get("cid", ""), d["type"], d["cat"], d["pri"], d["dept"], d["when"], d["text"],
              d["photo"], d["name"], d["phone"], d["file"], 1 if d["anon"] else 0,
              d["createdAt"], d["status"], d["assignee"], d["rating"],
              json.dumps(d["timeline"], ensure_ascii=False), last))

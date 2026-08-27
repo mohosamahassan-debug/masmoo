@@ -529,7 +529,15 @@ const Store={
   async submit(rep){
     R.unshift(rep);MY.unshift(rep.num);this.persist();
     const res=await API.post('/reports',rep);
-    if(!res){Outbox.add(rep);Net.show('البلاغ محفوظ على جهازك وسيُرسل تلقائياً عند عودة الشبكة');setTimeout(()=>Net.hide(),5000)}
+    if(!res){Outbox.add(rep);Net.show('البلاغ محفوظ على جهازك وسيُرسل تلقائياً عند عودة الشبكة');setTimeout(()=>Net.hide(),5000);return}
+    // الرقم المرجعي يمنحه الخادم — يمنع تضارب أرقام الأجهزة
+    if(res.num&&res.num!==rep.num)this.renumber(rep,res.num);
+  },
+  renumber(rep,num){
+    const old=rep.num;rep.num=num;
+    const i=MY.indexOf(old);if(i>=0)MY[i]=num;else MY.unshift(num);
+    this.persist();
+    const c=document.querySelector('#okB .c');if(c)c.textContent=num;
   },
   /* الضابط: يحدّث حالة البلاغ على الخادم */
   async update(rep){
@@ -574,7 +582,14 @@ const Outbox={
     if(!API.ok()||!navigator.onLine)return;
     const a=this.all();if(!a.length)return;
     const rest=[];
-    for(const r of a){const ok=await API.post('/reports',r);if(!ok)rest.push(r)}
+    for(const r of a){
+      const res=await API.post('/reports',r);
+      if(!res){rest.push(r);continue}
+      if(res.num&&res.num!==r.num){
+        const local=R.find(x=>x.num===r.num);
+        if(local)Store.renumber(local,res.num);
+      }
+    }
     localStorage.setItem(this.key,JSON.stringify(rest));
     if(a.length&&!rest.length){toast('تم إرسال البلاغات المؤجَّلة');Store.refresh(true)}
   }
@@ -800,6 +815,10 @@ function slaTag(r){
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),2400)}
 async function save(){Store.persist()}
 async function load(){Store.loadLocal()}
+function uid(){
+  try{return crypto.randomUUID()}catch(e){
+    return 'c-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10)}
+}
 function newNum(){const d=new Date();const day=`${String(d.getFullYear()).slice(2)}${p2(d.getMonth()+1)}${p2(d.getDate())}`;
   return `MS-${day}-${String(R.filter(r=>r.num.includes(day)).length+1).padStart(3,'0')}`}
 
@@ -866,7 +885,7 @@ $('#send').onclick=async()=>{
   if(!F.t){toast('اختر الجهة المعنية بالبلاغ');$('#main').scrollTop=0;return}
   if(tx.length<10){toast('اكتب تفاصيل أوضح — ١٠ أحرف على الأقل');$('#fText').focus();return}
   const an=$('#anon').classList.contains('on'),dp=$('#fDept').value;
-  const r={num:newNum(),type:F.t,cat:F.c,pri:F.p,dept:dp.startsWith('—')?'':dp,when:$('#fWhen').value,
+  const r={num:newNum(),cid:uid(),type:F.t,cat:F.c,pri:F.p,dept:dp.startsWith('—')?'':dp,when:$('#fWhen').value,
     text:tx,photo:F.img,name:an?'':$('#fName').value.trim(),phone:an?'':$('#fPhone').value.trim(),
     file:an?'':$('#fFile').value.trim(),anon:an,createdAt:Date.now(),status:'جديد',assignee:'',rating:0,
     timeline:[{status:'جديد',note:'تم استلام البلاغ وتسجيله آلياً في السجل المركزي.',at:Date.now(),by:'النظام'}]};

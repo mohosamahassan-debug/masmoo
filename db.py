@@ -24,12 +24,13 @@ if IS_PG:
 # ---------------------------------------------------------------- المخطط
 SCHEMA_SQLITE = """
 CREATE TABLE IF NOT EXISTS reports (
-    num TEXT PRIMARY KEY, type TEXT NOT NULL, cat TEXT, pri TEXT, dept TEXT,
+    num TEXT PRIMARY KEY, cid TEXT, type TEXT NOT NULL, cat TEXT, pri TEXT, dept TEXT,
     when_ TEXT, text TEXT NOT NULL, photo TEXT, name TEXT, phone TEXT, file TEXT,
     anon INTEGER DEFAULT 1, created_at INTEGER NOT NULL, status TEXT DEFAULT 'جديد',
     assignee TEXT, rating INTEGER DEFAULT 0, timeline TEXT NOT NULL,
     updated_at INTEGER NOT NULL
 );
+CREATE UNIQUE INDEX IF NOT EXISTS ix_cid ON reports(cid);
 CREATE INDEX IF NOT EXISTS ix_status  ON reports(status);
 CREATE INDEX IF NOT EXISTS ix_created ON reports(created_at);
 CREATE TABLE IF NOT EXISTS sessions (
@@ -45,12 +46,13 @@ CREATE TABLE IF NOT EXISTS settings (
 
 SCHEMA_PG = """
 CREATE TABLE IF NOT EXISTS reports (
-    num TEXT PRIMARY KEY, type TEXT NOT NULL, cat TEXT, pri TEXT, dept TEXT,
+    num TEXT PRIMARY KEY, cid TEXT, type TEXT NOT NULL, cat TEXT, pri TEXT, dept TEXT,
     when_ TEXT, text TEXT NOT NULL, photo TEXT, name TEXT, phone TEXT, file TEXT,
     anon INTEGER DEFAULT 1, created_at BIGINT NOT NULL, status TEXT DEFAULT 'جديد',
     assignee TEXT, rating INTEGER DEFAULT 0, timeline TEXT NOT NULL,
     updated_at BIGINT NOT NULL
 );
+CREATE UNIQUE INDEX IF NOT EXISTS ix_cid ON reports(cid);
 CREATE INDEX IF NOT EXISTS ix_status  ON reports(status);
 CREATE INDEX IF NOT EXISTS ix_created ON reports(created_at);
 CREATE TABLE IF NOT EXISTS sessions (
@@ -138,6 +140,12 @@ def db():
 def init():
     with db() as con:
         con.executescript(SCHEMA_PG if IS_PG else SCHEMA_SQLITE)
+    # ترحيل قاعدة قائمة من إصدار سابق
+    try:
+        with db() as con:
+            con.execute("ALTER TABLE reports ADD COLUMN cid TEXT")
+    except Exception:
+        pass
 
 
 def engine_name() -> str:
