@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "sd.gov.bluenile.damazin.masmoo",
+      "sha256_cert_fingerprints": [
+        "C4:3B:E3:8F:CD:E5:E4:F3:BB:7B:70:9B:74:E1:F5:BB:62:8E:86:E1:FD:05:C0:3D:7D:63:26:AB:72:97:05:06"
+      ]
+    }
+  }
+]

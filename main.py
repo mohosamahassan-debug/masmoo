@@ -381,3 +381,10 @@ def icons(fname: str):
 @app.get("/download", include_in_schema=False)
 def download_page():
     return _send("download.html", "text/html; charset=utf-8")
+
+
+# ---- التحقق من ملكية التطبيق (Digital Asset Links) ----
+# يخبر أندرويد أن تطبيق مسموع يملك هذا الموقع، فيختفي شريط عنوان المتصفح.
+@app.get("/.well-known/assetlinks.json", include_in_schema=False)
+def assetlinks():
+    return _send("assetlinks.json", "application/json")
